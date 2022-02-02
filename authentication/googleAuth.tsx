@@ -37,7 +37,7 @@ const GoogleButton = () => {
         GoogleSignin.configure({
             webClientId: '238441650397-5v30tk4vuga1od1n9lujufvd4g5gj6g2.apps.googleusercontent.com',
           });
-    })
+    },[])
 
     return (
         <Button title='google login'

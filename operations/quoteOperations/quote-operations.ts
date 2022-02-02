@@ -1,9 +1,9 @@
-import { Quote } from '../../models/models';
-import { getAllBooks, getBookById, clearBooks, updateBook, deleteBook } from '../bookOperations/book-operations';
+import { Book, Quote } from '../../models/models';
+import { getAllBooksOperation, getBookByIdOperation, clearBooksOperation, updateBookOperation, deleteBookOperation } from '../bookOperations/book-operations';
 
 export const getAllQuotesByBookId = async (bookId: string) => {
     try {
-        let book = await getBookById(bookId)
+        let book = await getBookByIdOperation(bookId)
         let quotes = book?.quotes
         return quotes
     }
@@ -12,24 +12,15 @@ export const getAllQuotesByBookId = async (bookId: string) => {
     }
 }
 
-export const getQuoteById = async (bookId: string, id: string) => {
-    let allQuotes = await getAllQuotesByBookId(bookId)
-    let quote = {}
-    if (allQuotes) {
-        for (let q of allQuotes) {
-            if (q.id === id) {
-                quote = q
-                break
-            }
-        }
-    }
+export const getQuoteById = async (book: Book,quoteId: string) => {
+    let allQuotes = book.quotes
+    let quote = allQuotes?.filter(q=>q.id!==quoteId)
     return quote
 }
 
-export const addQuote = async (bookId: string, id: string, value: any) => {
-    let book = await getBookById(bookId)
-    book?.quotes?.push({ ...value, id: id })
-    if (book) updateBook(bookId, book)
+export const addQuote = async (books: Book[]) => {
+   
+    await updateBookOperation(books)
 }
 
 export const updateQuote = async (bookId: string, id: string, value: any) => {

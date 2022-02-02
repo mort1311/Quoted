@@ -1,13 +1,32 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Book } from '../../models/models';
 
 
 export const getAllData = async () => {
-    let books = await getDataById("books")
-    let options = await getDataById("options")
-    let data = {books, options}
+    let books: any = [];
+    let options = {};
+    
+    let keys = await AsyncStorage.getAllKeys();
+    console.log( 'keys', keys)
+    await AsyncStorage.multiGet(keys, (err, stores)=>{
+        stores?.map((r, i, store)=>{
+            let key = store[i][0];
+            let value = store[i][1];
+            let jsonValue = JSON.parse(value as string)
+            if(key.includes('book'))books.push(jsonValue);
+            if(key=='options')options=jsonValue;
+        })
+    })
+    
+
+
+
+    let data = { books , options}
    // let jsonData = JSON.parse(data)
+   console.log('adll data', data.books)
     return data
 }
+
 
 export const getDataById = async (key: string) => {
     let data;
@@ -22,7 +41,7 @@ export const addData = async (key: string, value: any) => {
 }
 
 export const updateData = async (key: string, value: any) => {
-    await addData(key, value)
+    await AsyncStorage.setItem(key, JSON.stringify(value))
 }
 
 export const removeData = async (key: string) => {
