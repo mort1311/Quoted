@@ -13,152 +13,29 @@ import { useQuotes } from '../hooks/useQuotes'
 import { v4 as uuid } from 'uuid';
 import { Quote } from '../models/models';
 import { updateBookOperation } from '../operations/bookOperations/book-operations';
+import { updateQuote } from '../operations/quoteOperations/quote-operations';
 
 const QuoteScreen = ({ navigation, route }: any) => {
 
-    const {quotes, addQuote} = useQuotes(route.params.book, route.params.books, route.params.setBooks)
-    const [inputQuote, setInputQuote] = useState({quote: '', person: ''})
-  const [book, setBook] = useState(route.params.book)
+  const book = route.params.book;
+
+  const {quotes, addQuote, deleteQuote, updateQuote} = useQuotes(route.params.book)
+
+  const [isOptionsEnabled, setIsOptionsEnabled] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState<Quote>({id:'', quote:'', person: ''})
+
+  const [inputQuote, setInputQuote] = useState({quote: '', person: ''})
   const [isModalOpened, setIsModalOpened] = useState(false)
 
   const [isEditing, setIsEditing] = useState(false)
 
   const emptyQuote = {quote: '', person: ''}
-//   const [book, setBook] = useState(route.params.book)
-//   const [quotes, setQuotes] = useState<Quote[]>(route.params.book.quotes)
-
-//   const [isEditing, setIsEditing] = useState(false)
-//   const [isModalOpened, setIsModalOpened] = useState(false)
-
-//   const [title, setTitle] = useState('')
-//   const [quote, setQuote] = useState('')
-
-//   const [currentQuote, setCurrentQuote] = useState({ id: 0, title: '', quote: '' })
-//   const [isOptionsEnabled, setIsOptionsEnabled] = useState(false)
-
-//   const [lastQuoteId, setLastQuoteId] = useState(0)
-
-//   const [selectedQuoteId, setSelectedQuoteId] = useState(0)
-
-//   const [isPreviewModalOpened, setIsPreviewModalOpened] = useState(false)
-
-//   const addQuote = (id: number, value: any) => {
-//     route.params.updateBook(id, value)
-//     setLastQuoteId(lastQuoteId + 1)
-//     setQuotes([...quotes, { id: lastQuoteId + 1, title: title, quote: quote }])
-//   }
-
-//   const getLastQuoteId = () => {
-//     if (route.params.book.quotes.length > 0) {
-//       let lastId = route.params.book.quotes[route.params.book.quotes.length - 1].id
-//       setLastQuoteId(lastId)
-//     }
-//     else setLastQuoteId(0)
-//   }
-
-//   const removeQuoteById = (id: number) => {
-//     let arr = [] as Quote[]
-//     quotes.filter(quote => quote.id !== id).map((el) => arr.push(el))
-//     route.params.updateBook(book.id,
-//       { ...book, quotes: arr })
-//     setQuotes(arr)
-//   }
-
-//   const editQuoteById = (id: number) => {
-//     let arr = [] as Quote[]
-//     quotes.map((el) => {
-//       if (el.id === id) {
-//         arr.push({ ...el, title: title, quote: quote })
-//       }
-//       else arr.push(el)
-//     })
-//     route.params.updateBook(book.id,
-//       { ...book, quotes: arr })
-//     setQuotes(arr)
-//   }
-
-//   useEffect(() => {
-//     setBook(route.params.book)
-//     setQuotes(route.params.book.quotes)
-//     getLastQuoteId()
-//   }, [])
-
-//   const [image, setImage] = useState({})
-  
-//   const [croppedImage, setCroppedImage] = useState('')
-
-//   const [cameraImage, setCameraImage] = useState({})
-
-//   const openLibrary = () => {
-//     launchImageLibrary({ mediaType: 'photo' }, setImage)
-//   }
-
-// useEffect(()=>{
-//   const openCropper =async () => {
-//     ImagePicker.openCropper({
-//       path: image.assets[0].uri,
-//       mediaType: 'photo',
-//       freeStyleCropEnabled: true
-//     }).then(image => {
-//       setCroppedImage(image.path)
-//     });
-//   }
-//   image && openCropper()
-// },[image])
-
-// useEffect(()=>{
-//   const openCropper =async () => {
-//     cameraImage.uri && ImagePicker.openCropper({
-//       path: cameraImage.uri,
-//       mediaType: 'photo',
-//       freeStyleCropEnabled: true
-//     }).then(image => {
-//       console.log('image', image)
-//       setCroppedImage(image.path)
-    
-//     });
-//   }
-//   cameraImage && openCropper()
-// },[cameraImage])
-
-
-// useEffect(()=>{
-//   const getText=async () => {
-//     let result: any = []
-    
-//     try {
-     
-//       result = await TextRecognition.recognize(croppedImage)
-//     } catch { console.log('could not recognize text') }
-//     let formatedText = ''
-//     result.map((el) => {
-//       formatedText = formatedText + ' ' + el
-//     })
-//     setQuote(formatedText)  
-//   }  
-//   croppedImage!=='' && getText()
-// },[croppedImage])
 
   const [isCameraActive, setIsCameraActive] = useState(false)
 
-//   const [{ cameraRef }, { takePicture }] = useCamera({})
-
   const [isTextLoading, setIsTextLoading] = useState(false)
   const [isJustOpened, setIsJustOpened] = useState(false)
-//   useEffect(() => {
-//     isJustOpened && setIsModalOpened(true)
-//     setIsCameraActive(false)
 
-//     setTimeout(() => {
-//       setIsTextLoading(false)
-//     }, 2000)
-//   }, [isTextLoading])
-
-//   useEffect(() => {
-
-//     setIsTextLoading(false)
-
-//   }, [quote])
 
 
   return (
@@ -181,18 +58,18 @@ const QuoteScreen = ({ navigation, route }: any) => {
               {quotes && quotes?.map((q: any, index: number) => {
                 return (
                   <TouchableOpacity 
-                  // onLongPress={() => {
-                  //   isOptionsEnabled ?
-                  //     currentQuote === q && setIsOptionsEnabled(false)
-                  //     :
-                  //     setIsOptionsEnabled(true)
-                  //   setCurrentQuote(q)
+                  onLongPress={() => {
+                    isOptionsEnabled ?
+                      currentQuote === q && setIsOptionsEnabled(false)
+                      :
+                      setIsOptionsEnabled(true)
+                    setCurrentQuote(q)
 
-                  // }}
-                  //   onPress={() => {
-                  //     setIsPreviewModalOpened(true)
-                  //     setCurrentQuote(q)
-                  //   }}
+                  }}
+                    onPress={() => {
+                      // setIsPreviewModalOpened(true)
+                      setCurrentQuote(q)
+                    }}
                     delayLongPress={300}
                     key={index}
                     style={styles.quoteContainer}
@@ -200,18 +77,19 @@ const QuoteScreen = ({ navigation, route }: any) => {
 
                     {q.quote !== '' && <Text style={styles.smallText}>{q.quote}</Text>}
                     <View style={styles.titleView}>
-                      {q.title !== '' && <Text style={{ color: 'black' }}>- {q.title}</Text>}
+                      {q.title !== '' && <Text style={{ color: 'black' }}>- {q.person}</Text>}
                     </View>
-                    {/* {isOptionsEnabled && currentQuote.id === q.id &&
+                    {isOptionsEnabled && currentQuote.id === q.id &&
 
                       <View style={styles.optionsView}>
 
                         <Button
                           onPress={() => {
-                            setTitle(q.title)
-                            setQuote(q.quote)
+                            
 
-                            setSelectedQuoteId(q.id)
+                            setInputQuote({quote: q.quote, person: q.person})
+
+                      
 
                             setIsEditing(true)
                             setIsModalOpened(true)
@@ -220,11 +98,11 @@ const QuoteScreen = ({ navigation, route }: any) => {
                           style={styles.optionsButton}><Icon name='pencil' size={25} color="white" /></Button>
                         <Button
                           onPress={() => {
-                            removeQuoteById(q.id)
+                            deleteQuote(q.id)
                             setIsOptionsEnabled(false)
                           }}
                           style={styles.optionsButton}><Icon name='trash' size={25} color="white" /></Button>
-                      </View>} */}
+                      </View>}
                   </TouchableOpacity>
                 )
               })}
@@ -272,29 +150,22 @@ const QuoteScreen = ({ navigation, route }: any) => {
                   ><Icon name='camera' size={25} color="white" /></Button>
                   <Button onPress={async () => {
                     if (inputQuote.quote !== '' || inputQuote.person !== '') {
-                      // isEditing ?
-                      //   editQuoteById(selectedQuoteId)
-                      //   :
-                      //   addQuote(book.id,
-                      //     { ...book, quotes: [...quotes, { id: lastQuoteId + 1, title: title, quote: quote }] })
 
-                      // setIsModalOpened(false)
-                      // setIsEditing(false)
-
-                      // setTitle('')
-                      // setQuote('')
                     
-                      let newQuote = {id: uuid(), bookId: book.id, quote: inputQuote.quote, person: inputQuote.person}
-                      let newBook = {...book, quotes: [...quotes, newQuote]};
-                      await addQuote(book,newQuote)
-                      console.log('book',book)
-                      // await updateBookOperation(book.id, newBook)
+                      let newQuote = {quote: inputQuote.quote, person: inputQuote.person}
+                      setIsModalOpened(false)
+
+                      isEditing ?
+                        await updateQuote({id: currentQuote.id, quote: inputQuote.quote, person: inputQuote.person})
+                        :
+                        await addQuote(newQuote)
+                      setIsEditing(false)
              
-                    
+                      setIsOptionsEnabled(false);
                  
                     
                       setInputQuote(emptyQuote)
-                      setIsModalOpened(false)
+                      
                     }
                   }}
                     style={styles.modalButton}>{

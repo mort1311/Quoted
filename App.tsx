@@ -11,14 +11,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Button, SafeAreaView, Text, View } from 'react-native';
 // import { getAllBooks, clearBooks, updateBook, deleteBook, getBookById } from './operations/bookOperations/book-operations';
-import { addQuote, deleteQuote, getAllQuotesByBookId, getQuoteById, updateQuote } from './operations/quoteOperations/quote-operations';
-import { addData, getAllData, clearData } from './operations/asyncStoreOperations/asyncStore-operations'
-import { Book, Quote } from './models/models';
+import { addQuote, deleteQuote, getAllQuotesByBookId, getQuoteById, updateQuote } from './src/operations/quoteOperations/quote-operations';
+import { addData, getAllData, clearData } from './src/operations/asyncStoreOperations/asyncStore-operations'
+import { Book, Quote } from './src/models/models';
 import { v4 as uuid } from 'uuid';
-import GoogleButton from './authentication/googleAuth'
+import GoogleButton from './src/authentication/googleAuth'
 import firestore from '@react-native-firebase/firestore';
-import BookScreen from './screens/booksScreen';
-import QuoteScreen from './screens/quoteScreen';
+import BookScreen from './src/screens/booksScreen';
+import QuoteScreen from './src/screens/quoteScreen';
 import { NativeBaseProvider } from 'native-base'
 import { DreamyBrownTheme } from './themes/themes';
 import { useThemes } from './themes/useThemes';

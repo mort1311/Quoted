@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 // import { getAllBooks, clearBooks, addBook, updateBook, deleteBook, getBookById } from '../operations/bookOperations/book-operations'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from "react-native";
-import { Book } from "../models/models";
+import { Book, PreviewBook } from "../models/models";
 import { Button, Modal } from 'native-base'
 import { v4 as uuid } from 'uuid';
 import LinearGradient from 'react-native-linear-gradient';
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../../App";
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from "../components/Header";
 import { useBooks } from "../hooks/useBooks";
@@ -20,11 +20,11 @@ import { clearData } from "../operations/asyncStoreOperations/asyncStore-operati
 //render books
 
 const BookScreen = ({ navigation }: any) => {
-    const { books, addBook, deleteBook, updateBook, setBooks } = useBooks()
+    const { previewBooks, addBook, deleteBook, updateBook } = useBooks()
 
-    const [clickedBook, setClickedBook] = useState<Book>({})
+    const [clickedBook, setClickedBook] = useState<PreviewBook>({id: '', name: '', author: ''})
 
-    const [inputBook, setInputBook] = useState<Book>({ name: '', author: '' })
+    const [inputBook, setInputBook] = useState<Book>({id:'', name: '', author: '' })
 
     const [isModalOpened, setIsModalOpened] = useState(false)
 
@@ -34,35 +34,35 @@ const BookScreen = ({ navigation }: any) => {
 
     const contextThemes = useContext<any>(ThemeContext)
 
-    const emptyBook = { name: '', author: '' }
+    const emptyBook = {id:'', name: '', author: '' }
 
 
     return (
         <LinearGradient colors={[contextThemes.currentTheme.gradientColor1.color, contextThemes.currentTheme.gradientColor2.color]} style={contextThemes.currentTheme.mainContainer}>
             <Header navigation={navigation} isBackButtonShown={false} isOptionsShown={true} title='Books' />
 
-            <Button onPress={()=> clearData()}>clear data</Button>
-
-            {books && books.length === 0 && <View style={contextThemes.currentTheme.emptyView}>
+            <Button onPress={() => clearData()}>clear data</Button>
+            <Button >do something</Button>
+            {previewBooks && previewBooks.length === 0 && <View style={contextThemes.currentTheme.emptyView}>
                 <Text style={contextThemes.currentTheme.emptyText}>Are you ready to Quote your journey?</Text>
             </View>}
             <ScrollView>
                 {
-                   books && books.length > 0 && books?.map((book, index) => {
+                    previewBooks && previewBooks.length > 0 && previewBooks?.map((book, index) => {
 
                         return (
                             <View key={index} style={contextThemes.currentTheme.bookItemContainer}>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        navigation.navigate("QuoteScreen", { book, books, setBooks })
-                                      }}
+                                        navigation.navigate("QuoteScreen", { book })
+                                    }}
                                     onLongPress={() => {
                                         setClickedBook(book)
                                         isBookOptionsEnabled ?
                                             clickedBook === book &&
                                             setIsBookOptionsEnabled(false)
                                             : setIsBookOptionsEnabled(true)
-                                        
+
                                     }}
                                     delayLongPress={300}
                                     style={contextThemes.currentTheme.bookContainer}
@@ -76,11 +76,11 @@ const BookScreen = ({ navigation }: any) => {
                                 {isBookOptionsEnabled && book.id === clickedBook.id && <View style={contextThemes.currentTheme.flexRow}>
                                     <Button
                                         onPress={() => {
-                                          setIsEditing(true)
-                                          setIsModalOpened(true)
-                                          
+                                            setIsEditing(true)
+                                            setIsModalOpened(true)
 
-                                          setInputBook(book)
+
+                                            setInputBook(book)
                                         }}
                                         style={contextThemes.currentTheme.optionsButton}><Icon name='pencil' size={25} color="white"></Icon></Button>
 
@@ -115,15 +115,15 @@ const BookScreen = ({ navigation }: any) => {
                                         if (inputBook.name !== '' || inputBook.author !== '') {
                                             isEditing ?
 
-                                            //    updateBook(clickedBook.id, { ...clickedBook, name: inputBook.name, author: inputBook.author, id: clickedBook.id })
-                                            //   :
-                                            //    addBook(uuid(), { name: inputBook.name, author: inputBook.author, quotes: [] })
-                                            await updateBook({ id: clickedBook.id, name: inputBook.name, author: inputBook.author, quotes: [] })
-                                            :
-                                            await addBook({ name: inputBook.name, author: inputBook.author, quotes: [] })
+                                                //    updateBook(clickedBook.id, { ...clickedBook, name: inputBook.name, author: inputBook.author, id: clickedBook.id })
+                                                //   :
+                                                //    addBook(uuid(), { name: inputBook.name, author: inputBook.author, quotes: [] })
+                                                await updateBook({ id: clickedBook.id as string, name: inputBook.name, author: inputBook.author})
+                                                :
+                                                await addBook({ name: inputBook.name, author: inputBook.author })
                                             setIsModalOpened(false)
                                             setIsEditing(false)
-                                
+
                                             //setIsEditing(false)
 
                                             setInputBook(emptyBook)

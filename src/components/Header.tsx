@@ -1,7 +1,7 @@
 import { Button } from 'native-base'
 import React, { useContext } from 'react'
 import { View, Text } from 'react-native'
-import { ThemeContext } from '../App'
+import { ThemeContext } from '../../App'
 import Icon from 'react-native-vector-icons/Ionicons';
 
 interface HeaderProps{

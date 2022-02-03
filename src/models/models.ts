@@ -1,8 +1,14 @@
 export interface Book {
-    id?: string,
+    id: string,
     name?: string,
     author?: string,
     quotes?: Quote[]
+}
+
+export interface PreviewBook {
+    id: string,
+    name?: string,
+    author?: string
 }
 
 export interface Quote{
